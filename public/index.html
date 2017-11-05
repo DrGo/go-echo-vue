@@ -12,8 +12,8 @@
 
 
     <!-- Vue.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/0.7.0/vue-resource.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.3.4/vue-resource.min.js"></script>
 </head>
 
 <body>
@@ -29,36 +29,39 @@
             </div>
         </div>
     </section>
-    <section class="section">
-        <div class="container">
-            <div class="columns">
-                <div class="column">
-                    <table class="table">
-                        <tbody>
-                            <tr v-for="task in tasks">
-                                <td>{{ task.name }}</td>
-                                <td>
-                                    <a class="delete" v-on:click="deleteTask($index)"></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="field has-addons">
-                        <div class="control">
-                            <input type="text" class="input" placeholder="New Task" v-on:keyup.enter="createTask" v-model="newTask.name">
-                        </div>
-                        <div class="control">
-                            <button class="button is-info" type="button" v-on:click="createTask">Create</button>
+
+    <div id="vapp1">
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column">
+                        <table class="table">
+                            <tbody>
+                                <tr v-for="task in tasks" :key="task.id">
+                                    <td>{{ task.name }}</td>
+                                    <td>
+                                        <a class="delete" v-on:click="deleteTask(task)"></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input type="text" class="input" placeholder="New Task" v-on:keyup.enter="createTask" v-model="newTask.name">
+                            </div>
+                            <div class="control">
+                                <button class="button is-info" type="button" v-on:click="createTask">Create</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <script>
         new Vue({
-            el: 'body',
+            el: '#vapp1',
 
             data: {
                 tasks: [],
@@ -68,7 +71,7 @@
             // This is run whenever the page is loaded to make sure we have a current task list
             created: function () {
                 // Use the vue-resource $http client to fetch data from the /tasks route
-                this.$http.get('/tasks').then(function (response) {
+                this.$http.get('/tasks').then(response => {
                     this.tasks = response.data.items ? response.data.items : []
                 })
             },
@@ -79,25 +82,24 @@
                         this.newTask = {}
                         return
                     }
-
+                    
                     // Post the new task to the /tasks route using the $http client
-                    this.$http.put('/tasks', this.newTask).success(function (response) {
-                        this.newTask.id = response.created
+                    this.$http.put('/tasks', this.newTask).then(response => {
+                        this.newTask.id = response.body.created
                         this.tasks.push(this.newTask)
-                        console.log("Task created!")
-                        console.log(this.newTask)
+                        console.log("Task "+this.newTask.id+" created!")
                         this.newTask = {}
-                    }).error(function (error) {
+                    }, error => {
                         console.log(error)
                     });
                 },
 
-                deleteTask: function (index) {
+                deleteTask: function (elm) {
                     // Use the $http client to delete a task by its id
-                    this.$http.delete('/tasks/' + this.tasks[index].id).success(function (response) {
-                        this.tasks.splice(index, 1)
-                        console.log("Task deleted!")
-                    }).error(function (error) {
+                    this.$http.delete('/tasks/' + elm.id).then(response => {
+                        this.tasks.splice(this.tasks.indexOf(elm), 1)
+                        console.log("Task "+elm.id+" deleted!")
+                    }, error => {
                         console.log(error)
                     })
                 }
