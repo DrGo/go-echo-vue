@@ -14,6 +14,13 @@
     <!-- Vue.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.3.4/vue-resource.min.js"></script>
+
+    <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+
+    <!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.14.1/vuedraggable.min.js"></script>
+
 </head>
 
 <body>
@@ -33,9 +40,25 @@
     <div id="vapp1">
         <section class="section">
             <div class="container">
+                <div class="field has-addons">
+                    <div class="control">
+                        <input type="text" class="input" placeholder="New Task" v-on:keyup.enter="createTask" v-model="newTask.name">
+                    </div>
+                    <div class="control">
+                        <button class="button is-info" type="button" v-on:click="createTask">Create</button>
+                    </div>
+                </div>
                 <div class="columns">
-                    <div class="column">
-                        <table class="table">
+                    <div class="column is-one-quarter panel">
+
+                        <draggable v-model="tasks" :options="{group:'tasks', delay: 0.3, animation: 150}" @start="drag=true" @end="drag=false">
+                            <div class="panel-block" v-for="task in tasks" :key="task.id">
+                                <p>{{ task.name }}</p> &nbsp;
+                                <a class="delete" v-on:click="deleteTask(task)"></a>
+                            </div>
+                        </draggable>
+
+                        <!-- <table class="table">
                             <tbody>
                                 <tr v-for="task in tasks" :key="task.id">
                                     <td>{{ task.name }}</td>
@@ -44,15 +67,7 @@
                                     </td>
                                 </tr>
                             </tbody>
-                        </table>
-                        <div class="field has-addons">
-                            <div class="control">
-                                <input type="text" class="input" placeholder="New Task" v-on:keyup.enter="createTask" v-model="newTask.name">
-                            </div>
-                            <div class="control">
-                                <button class="button is-info" type="button" v-on:click="createTask">Create</button>
-                            </div>
-                        </div>
+                        </table> -->
                     </div>
                 </div>
             </div>
@@ -82,12 +97,12 @@
                         this.newTask = {}
                         return
                     }
-                    
+
                     // Post the new task to the /tasks route using the $http client
                     this.$http.put('/tasks', this.newTask).then(response => {
                         this.newTask.id = response.body.created
                         this.tasks.push(this.newTask)
-                        console.log("Task "+this.newTask.id+" created!")
+                        console.log("Task " + this.newTask.id + " created!")
                         this.newTask = {}
                     }, error => {
                         console.log(error)
@@ -98,7 +113,7 @@
                     // Use the $http client to delete a task by its id
                     this.$http.delete('/tasks/' + elm.id).then(response => {
                         this.tasks.splice(this.tasks.indexOf(elm), 1)
-                        console.log("Task "+elm.id+" deleted!")
+                        console.log("Task " + elm.id + " deleted!")
                     }, error => {
                         console.log(error)
                     })
