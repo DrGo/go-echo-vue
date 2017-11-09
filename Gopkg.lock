@@ -10,8 +10,8 @@
 [[projects]]
   name = "github.com/labstack/echo"
   packages = ["."]
-  revision = "cec7629194fe4bf83b0c72d9a02d340c7a1468ac"
-  version = "3.2.3"
+  revision = "b28538b2e3f5446fe6e0e47ee34cd74b662ca2ab"
+  version = "3.2.4"
 
 [[projects]]
   name = "github.com/labstack/gommon"
@@ -47,13 +47,13 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["acme","acme/autocert"]
-  revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
+  revision = "6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "95c6576299259db960f6c5b9b69ea52422860fce"
+  revision = "4b45465282a4624cf39876842a017334f13b8aff"
 
 [solve-meta]
   analyzer-name = "dep"
