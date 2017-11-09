@@ -1,0 +1,49 @@
+{{ define "script" }}
+<script lang="javascript">
+    new Vue({
+        el: '#vapp1',
+        delimiters: ['${', '}'],
+
+        data: {
+            tasks: [],
+            newTask: {}
+        },
+
+        // This is run whenever the page is loaded to make sure we have a current task list
+        created: function () {
+            // Use the vue-resource $http client to fetch data from the /tasks route
+            this.$http.get('/tasks').then(response => {
+                this.tasks = response.data.items ? response.data.items : []
+            })
+        },
+
+        methods: {
+            createTask: function () {
+                if (!this.newTask.name.trim()) {
+                    this.newTask = {}
+                    return
+                }
+
+                // Post the new task to the /tasks route using the $http client
+                this.$http.put('/tasks', this.newTask).then(response => {
+                    this.newTask.id = response.body.created
+                    this.tasks.push(this.newTask)
+                    console.log("Task " + this.newTask.id + " created!")
+                    this.newTask = {}
+                }, error => {
+                    console.log(error)
+                });
+            },
+
+            deleteTask: function (elm) {
+                // Use the $http client to delete a task by its id
+                this.$http.delete('/tasks/' + elm.id).then(response => {
+                    this.tasks.splice(this.tasks.indexOf(elm), 1)
+                    console.log("Task " + elm.id + " deleted!")
+                }, error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script> {{ end }}
